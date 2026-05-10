@@ -1,0 +1,52 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container">
+    <h1>Subscribe</h1>
+    <p>Support the server and unlock exclusive perks and privileges.</p>
+  </div>
+</div>
+
+<div class="container sub-page">
+  <div class="sub-plans">
+    ${plans.map((plan, i) => `
+    <div class="sub-card ${i===1?'featured':''}">
+      ${i===1?'<div class="sub-badge">Most Popular</div>':''}
+      <div class="sub-header" style="border-color:${plan.color}">
+        <div class="sub-icon" style="background:${plan.color}20;color:${plan.color}">${['⚔️','🛡️','👑'][i]||'⭐'}</div>
+        <h2>${plan.name}</h2>
+        <div class="sub-price">
+          <span class="price-amount">$${plan.price}</span>
+          <span class="price-period">/month</span>
+        </div>
+        <p>${plan.description||''}</p>
+      </div>
+      <ul class="sub-features">
+        ${plan.features.map(f => `<li><span class="check" style="color:${plan.color}">✓</span>${f}</li>`).join('')}
+      </ul>
+      <div class="sub-footer">
+        <div class="rank-preview" style="background:${plan.color}20;border-color:${plan.color};color:${plan.color}">${plan.rank_name||plan.name} Rank</div>
+        ${user ? `<button class="btn btn-primary full-width" style="background:${plan.color};border-color:${plan.color}" onclick="alert('Payment system coming soon! Contact admin to subscribe.')">Get ${plan.name}</button>` :
+        `<button class="btn btn-primary full-width" style="background:${plan.color};border-color:${plan.color}" onclick="openAuth('register')">Sign Up to Subscribe</button>`}
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <div class="sub-note">
+    <h3>How does it work?</h3>
+    <div class="sub-faq">
+      <div class="faq-item">
+        <strong>When will I receive my rank?</strong>
+        <p>Ranks are applied within 24 hours of payment confirmation.</p>
+      </div>
+      <div class="faq-item">
+        <strong>Are subscriptions recurring?</strong>
+        <p>Yes, subscriptions auto-renew monthly. You can cancel anytime.</p>
+      </div>
+      <div class="faq-item">
+        <strong>Do perks work across seasons?</strong>
+        <p>Cosmetic perks and forum badges carry over. Map-specific perks reset with each season.</p>
+      </div>
+    </div>
+  </div>
+</div>
+` }) %>

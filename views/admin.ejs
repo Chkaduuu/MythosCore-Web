@@ -1,0 +1,191 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container">
+    <h1>⚙️ Admin Panel</h1>
+    <p>MythosCore administration dashboard</p>
+  </div>
+</div>
+
+<div class="container admin-layout">
+
+  <!-- Stats -->
+  <div class="admin-stats">
+    <div class="as-card"><span class="as-num">${stats.users}</span><span>Users</span></div>
+    <div class="as-card"><span class="as-num">${stats.threads}</span><span>Threads</span></div>
+    <div class="as-card"><span class="as-num">${stats.resources}</span><span>Resources</span></div>
+    <div class="as-card"><span class="as-num">${stats.messages}</span><span>Messages</span></div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="admin-tabs">
+    <button class="atab active" onclick="showTab('users')">Users</button>
+    <button class="atab" onclick="showTab('banners')">Banners</button>
+    <button class="atab" onclick="showTab('broadcast')">Broadcast</button>
+  </div>
+
+  <!-- Users tab -->
+  <div class="admin-tab-content active" id="tab-users">
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>User</th><th>Email</th><th>Role</th><th>Rank</th><th>Subscription</th><th>Joined</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${users.map(u => `
+          <tr id="user-row-${u.id}">
+            <td><strong>${u.username}</strong></td>
+            <td>${u.email}</td>
+            <td><span class="rank-tag ${u.role}">${u.role}</span></td>
+            <td>${u.site_rank||u.role}</td>
+            <td>${u.subscription||'free'}</td>
+            <td>${new Date(u.created_at).toLocaleDateString()}</td>
+            <td>
+              <button class="btn btn-sm btn-outline" onclick="openUserModal(${JSON.stringify(u).replace(/"/g,'&quot;')})">Edit</button>
+              ${u.id !== ${user.id} ? `<button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id},'${u.username}')">Delete</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Banners tab -->
+  <div class="admin-tab-content" id="tab-banners">
+    <form action="/admin/banner/add" method="POST" class="admin-form">
+      <h3>Add Banner</h3>
+      <div class="admin-form-grid">
+        <div class="field-group"><label>Title</label><input type="text" name="title" placeholder="Banner title"/></div>
+        <div class="field-group"><label>Image URL (optional)</label><input type="text" name="image_url" placeholder="https://..."/></div>
+        <div class="field-group full"><label>Content</label><textarea name="content" rows="3" placeholder="Banner description text..."></textarea></div>
+        <div class="field-group"><label>Link URL (optional)</label><input type="text" name="link_url" placeholder="https://..."/></div>
+      </div>
+      <button class="btn btn-primary" type="submit">Add Banner</button>
+    </form>
+
+    <h3>Current Banners</h3>
+    <div class="banners-list">
+      ${banners.map(b => `
+      <div class="banner-row">
+        <div class="br-info">
+          <strong>${b.title||'(no title)'}</strong>
+          <span>${b.content||''}</span>
+          <span class="br-status ${b.active?'active':'inactive'}">${b.active?'Active':'Hidden'}</span>
+        </div>
+        <div class="br-actions">
+          <form action="/admin/banner/${b.id}/toggle" method="POST" style="display:inline">
+            <button class="btn btn-sm btn-outline">${b.active?'Hide':'Show'}</button>
+          </form>
+          <form action="/admin/banner/${b.id}/delete" method="POST" style="display:inline" onsubmit="return confirm('Delete banner?')">
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- Broadcast tab -->
+  <div class="admin-tab-content" id="tab-broadcast">
+    <div class="admin-form">
+      <h3>Send Message</h3>
+      <form action="/messages/broadcast" method="POST">
+        <div class="field-group">
+          <label>Target</label>
+          <select name="target">
+            <option value="all">📢 All Users (Broadcast)</option>
+            ${users.map(u => `<option value="${u.id}">${u.username}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Subject</label>
+          <input type="text" name="subject" placeholder="Message subject..."/>
+        </div>
+        <div class="field-group">
+          <label>Message</label>
+          <textarea name="content" rows="6" placeholder="Write your message..." required></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- User Edit Modal -->
+<div class="modal-overlay" id="userEditOverlay" onclick="closeUserModal(event)" style="display:none">
+  <div class="modal-box" id="userEditBox">
+    <button class="modal-close" onclick="document.getElementById('userEditOverlay').style.display='none'">✕</button>
+    <h3>Edit User: <span id="editUsername"></span></h3>
+    <div class="field-group">
+      <label>Role</label>
+      <select id="editRole">
+        <option value="user">User</option>
+        <option value="moderator">Moderator</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Site Rank (display name)</label>
+      <input type="text" id="editRank" placeholder="e.g. Moderator, VIP, Builder"/>
+    </div>
+    <div class="field-group">
+      <label>Moderator Permissions</label>
+      <div class="perm-grid">
+        ${permissions.map(p => `<label class="perm-check"><input type="checkbox" class="perm-cb" value="${p}"/> ${p.replace(/_/g,' ')}</label>`).join('')}
+      </div>
+    </div>
+    <div class="auth-msg" id="editMsg"></div>
+    <button class="btn btn-primary full-width" onclick="saveUserEdit()">Save Changes</button>
+  </div>
+</div>
+
+<script>
+let editingUserId = null;
+
+function showTab(name) {
+  document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.atab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function openUserModal(u) {
+  editingUserId = u.id;
+  document.getElementById('editUsername').textContent = u.username;
+  document.getElementById('editRole').value = u.role;
+  document.getElementById('editRank').value = u.site_rank || u.role;
+  const perms = JSON.parse(u.rank_permissions || '[]');
+  document.querySelectorAll('.perm-cb').forEach(cb => cb.checked = perms.includes(cb.value));
+  document.getElementById('userEditOverlay').style.display = 'flex';
+}
+
+function closeUserModal(e) {
+  if (!e || e.target === document.getElementById('userEditOverlay'))
+    document.getElementById('userEditOverlay').style.display = 'none';
+}
+
+async function saveUserEdit() {
+  const role = document.getElementById('editRole').value;
+  const site_rank = document.getElementById('editRank').value;
+  const permissions = Array.from(document.querySelectorAll('.perm-cb:checked')).map(cb => cb.value);
+  const msg = document.getElementById('editMsg');
+  const res = await fetch('/admin/user/'+editingUserId+'/role', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ role, site_rank, permissions })
+  });
+  const data = await res.json();
+  msg.textContent = data.message || (data.success ? 'Saved!' : 'Error');
+  msg.className = 'auth-msg ' + (data.success ? 'success' : 'error');
+  if (data.success) setTimeout(() => { document.getElementById('userEditOverlay').style.display='none'; location.reload(); }, 800);
+}
+
+async function deleteUser(id, name) {
+  if (!confirm('Delete user ' + name + '? This cannot be undone.')) return;
+  const res = await fetch('/admin/user/'+id+'/delete', { method:'POST' });
+  const data = await res.json();
+  if (data.success) document.getElementById('user-row-'+id)?.remove();
+  else alert(data.message);
+}
+</script>
+` }) %>

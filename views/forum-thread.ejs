@@ -1,0 +1,75 @@
+<%- include('layout', { body: `
+<div class="container mt-3">
+  <div class="breadcrumb">
+    <a href="/forum">Forum</a> › <a href="/forum/category/${thread.cat_id}">${thread.cat_name}</a> › ${thread.title}
+  </div>
+
+  ${thread.pinned ? '<div class="thread-badge pinned-badge">📌 Pinned</div>' : ''}
+  ${thread.locked ? '<div class="thread-badge locked-badge">🔒 Locked</div>' : ''}
+
+  <!-- Mod controls -->
+  ${user && (user.role==='admin'||user.role==='moderator') ? `
+  <div class="mod-bar">
+    <form action="/forum/thread/${thread.id}/pin" method="POST" style="display:inline">
+      <button class="btn btn-sm btn-outline">${thread.pinned?'Unpin':'Pin'}</button>
+    </form>
+    <form action="/forum/thread/${thread.id}/lock" method="POST" style="display:inline">
+      <button class="btn btn-sm btn-outline">${thread.locked?'Unlock':'Lock'}</button>
+    </form>
+    <form action="/forum/thread/${thread.id}/delete" method="POST" style="display:inline" onsubmit="return confirm('Delete this thread?')">
+      <button class="btn btn-sm btn-danger">Delete Thread</button>
+    </form>
+  </div>` : ''}
+
+  <!-- OP post -->
+  <div class="post-card op-post">
+    <div class="post-sidebar">
+      <a href="/profile/${thread.user_id}">
+        <img src="${thread.avatar}" class="post-avatar" onerror="this.src='/img/default-avatar.png'"/>
+      </a>
+      <a href="/profile/${thread.user_id}" class="post-username">${thread.username}</a>
+      <span class="rank-tag ${thread.role}">${thread.site_rank||thread.role}</span>
+    </div>
+    <div class="post-body">
+      <div class="post-header-row">
+        <h2>${thread.title}</h2>
+        <span class="post-date">${new Date(thread.created_at).toLocaleString()}</span>
+      </div>
+      <div class="post-content">${thread.content.replace(/\n/g,'<br/>')}</div>
+    </div>
+  </div>
+
+  <!-- Replies -->
+  ${posts.map((p, i) => `
+  <div class="post-card" id="post-${p.id}">
+    <div class="post-sidebar">
+      <a href="/profile/${p.user_id}">
+        <img src="${p.avatar}" class="post-avatar" onerror="this.src='/img/default-avatar.png'"/>
+      </a>
+      <a href="/profile/${p.user_id}" class="post-username">${p.username}</a>
+      <span class="rank-tag ${p.role}">${p.site_rank||p.role}</span>
+    </div>
+    <div class="post-body">
+      <div class="post-header-row">
+        <span class="post-num">#${i+1}</span>
+        <span class="post-date">${new Date(p.created_at).toLocaleString()}</span>
+      </div>
+      <div class="post-content">${p.content.replace(/\n/g,'<br/>')}</div>
+    </div>
+  </div>`).join('')}
+
+  <!-- Reply form -->
+  <div id="bottom"></div>
+  ${user && !thread.locked ? `
+  <div class="reply-box">
+    <h3>Post a Reply</h3>
+    <form action="/forum/thread/${thread.id}/reply" method="POST">
+      <textarea name="content" placeholder="Write your reply..." rows="5" required></textarea>
+      <button class="btn btn-primary mt-1" type="submit">Post Reply</button>
+    </form>
+  </div>` : !user ? `
+  <div class="reply-box text-center">
+    <p><button class="btn btn-primary" onclick="openAuth('login')">Log in to reply</button></p>
+  </div>` : `<div class="reply-box"><p class="text-center">🔒 This thread is locked.</p></div>`}
+</div>
+` }) %>

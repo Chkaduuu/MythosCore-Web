@@ -1,0 +1,26 @@
+<%- include('layout', { body: `
+<div class="page-header"><div class="container"><h1>New Message</h1></div></div>
+<div class="container narrow mt-3">
+  <form action="/messages/send" method="POST">
+    <div class="field-group">
+      <label>To</label>
+      <select name="recipient_id" required>
+        <option value="">Select recipient...</option>
+        ${users.map(u => `<option value="${u.id}" ${to==u.id?'selected':''}>${u.username}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Subject</label>
+      <input type="text" name="subject" placeholder="Message subject..."/>
+    </div>
+    <div class="field-group">
+      <label>Message</label>
+      <textarea name="content" rows="8" placeholder="Write your message..." required></textarea>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <button class="btn btn-primary" type="submit">Send Message</button>
+      <a href="/messages" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+` }) %>

@@ -1,0 +1,26 @@
+<%- include('layout', { body: `
+<div class="page-header"><div class="container"><h1>New Thread</h1></div></div>
+<div class="container narrow mt-3">
+  <form action="/forum/thread/new" method="POST">
+    <div class="field-group">
+      <label>Category</label>
+      <select name="category_id" required>
+        <option value="">Select a category...</option>
+        ${categories.map(c => `<option value="${c.id}" ${catId==c.id?'selected':''}>${c.icon} ${c.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Title</label>
+      <input type="text" name="title" placeholder="Thread title..." required maxlength="200"/>
+    </div>
+    <div class="field-group">
+      <label>Content</label>
+      <textarea name="content" rows="10" placeholder="Write your post here..." required></textarea>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <button class="btn btn-primary" type="submit">Post Thread</button>
+      <a href="/forum" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+` }) %>

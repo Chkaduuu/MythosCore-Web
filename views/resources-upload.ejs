@@ -1,0 +1,29 @@
+<%- include('layout', { body: `
+<div class="page-header"><div class="container"><h1>Upload Resource</h1></div></div>
+<div class="container narrow mt-3">
+  <form action="/resources/upload" method="POST">
+    <div class="field-group">
+      <label>Category</label>
+      <select name="category" required>
+        ${categories.map(c=>`<option value="${c}">${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Title</label>
+      <input type="text" name="title" placeholder="Resource title..." required maxlength="200"/>
+    </div>
+    <div class="field-group">
+      <label>Description</label>
+      <textarea name="description" rows="5" placeholder="Describe your resource..."></textarea>
+    </div>
+    <div class="field-group">
+      <label>Download URL</label>
+      <input type="url" name="download_url" placeholder="https://..."/>
+    </div>
+    <div style="display:flex;gap:1rem">
+      <button class="btn btn-primary" type="submit">Upload Resource</button>
+      <a href="/resources" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+` }) %>

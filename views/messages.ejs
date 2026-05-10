@@ -1,0 +1,52 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center">
+    <div><h1>Messages ${unread>0?'<span class="badge ml-1">'+unread+'</span>':''}</h1></div>
+    <div style="display:flex;gap:.5rem">
+      <a href="/messages/compose" class="btn btn-primary">✉ Compose</a>
+      ${user && (user.role==='admin'||user.role==='moderator') ? `<a href="/messages/broadcast" class="btn btn-outline">📢 Broadcast</a>` : ''}
+    </div>
+  </div>
+</div>
+
+<div class="container messages-layout">
+  <div class="msg-tabs">
+    <button class="mtab active" onclick="showMsgTab('inbox')">Inbox (${inbox.length})</button>
+    <button class="mtab" onclick="showMsgTab('sent')">Sent (${sent.length})</button>
+  </div>
+
+  <div class="msg-tab-content active" id="mtab-inbox">
+    ${inbox.length ? inbox.map(m => `
+    <a href="/messages/${m.id}" class="msg-row ${!m.read_at?'unread':''}">
+      <img src="${m.sender_avatar}" class="msg-avatar" onerror="this.src='/img/default-avatar.png'"/>
+      <div class="msg-info">
+        <div class="msg-from">${m.sender_name} ${m.is_broadcast?'<span class="badge">Broadcast</span>':''}</div>
+        <div class="msg-subject">${m.subject||'(no subject)'}</div>
+        <div class="msg-preview">${m.content.substring(0,80)}${m.content.length>80?'…':''}</div>
+      </div>
+      <div class="msg-date">${new Date(m.created_at).toLocaleDateString()}</div>
+    </a>`).join('') : '<div class="empty-state-box"><p>Your inbox is empty.</p></div>'}
+  </div>
+
+  <div class="msg-tab-content" id="mtab-sent">
+    ${sent.length ? sent.map(m => `
+    <a href="/messages/${m.id}" class="msg-row">
+      <div class="msg-info">
+        <div class="msg-from">To: ${m.is_broadcast?'<strong>All Users</strong>':(m.recipient_name||'Unknown')}</div>
+        <div class="msg-subject">${m.subject||'(no subject)'}</div>
+        <div class="msg-preview">${m.content.substring(0,80)}${m.content.length>80?'…':''}</div>
+      </div>
+      <div class="msg-date">${new Date(m.created_at).toLocaleDateString()}</div>
+    </a>`).join('') : '<div class="empty-state-box"><p>No sent messages.</p></div>'}
+  </div>
+</div>
+
+<script>
+function showMsgTab(name) {
+  document.querySelectorAll('.msg-tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.mtab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('mtab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+` }) %>

@@ -1,0 +1,19 @@
+<%- include('layout', { body: `
+<div class="container narrow mt-3">
+  <div class="msg-detail-card">
+    <div class="mdc-header">
+      <img src="${msg.sender_avatar}" class="msg-avatar" onerror="this.src='/img/default-avatar.png'"/>
+      <div>
+        <strong>${msg.sender_name}</strong> ${msg.is_broadcast?'<span class="badge">Broadcast</span>':''}
+        <div class="mdc-date">${new Date(msg.created_at).toLocaleString()}</div>
+      </div>
+    </div>
+    <h2>${msg.subject||'(no subject)'}</h2>
+    <div class="mdc-body">${msg.content.replace(/\n/g,'<br/>')}</div>
+    <div class="mdc-actions">
+      <a href="/messages/compose?to=${msg.sender_id}" class="btn btn-primary">← Reply</a>
+      <a href="/messages" class="btn btn-outline">Back to Inbox</a>
+    </div>
+  </div>
+</div>
+` }) %>

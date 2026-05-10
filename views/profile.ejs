@@ -1,0 +1,92 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container">
+    <h1>My Profile</h1>
+  </div>
+</div>
+
+<div class="container profile-layout">
+  <!-- Left col: avatar + info -->
+  <div class="profile-sidebar">
+    <div class="profile-avatar-wrap">
+      <img src="${user.avatar}" id="avatarPreview" class="profile-avatar-big" onerror="this.src='/img/default-avatar.png'"/>
+      <label class="avatar-change-btn" for="avatarInput">Change Photo</label>
+    </div>
+    <div class="profile-info-block">
+      <h2>${user.username}</h2>
+      <span class="rank-tag ${user.role} lg">${user.site_rank||user.role}</span>
+      <p class="profile-bio">${user.bio||'No bio yet.'}</p>
+      <div class="profile-meta">
+        <span>🗓 Joined ${new Date(user.created_at).toLocaleDateString()}</span>
+        <span>📧 ${user.email}</span>
+        <span>💎 ${user.subscription||'Free'} Plan</span>
+      </div>
+    </div>
+    <a href="/subscribe" class="btn btn-outline full-width mt-2">Upgrade Subscription</a>
+  </div>
+
+  <!-- Right col: forms -->
+  <div class="profile-forms">
+    <!-- Update Profile -->
+    <div class="pf-section">
+      <h3>Edit Profile</h3>
+      <form action="/profile/update" method="POST" enctype="multipart/form-data">
+        <input type="file" id="avatarInput" name="avatar" accept="image/*" style="display:none" onchange="previewAvatar(this)"/>
+        <div class="field-group">
+          <label>Username</label>
+          <input type="text" name="username" value="${user.username}" required/>
+        </div>
+        <div class="field-group">
+          <label>Bio</label>
+          <textarea name="bio" rows="4" placeholder="Tell the community about yourself...">${user.bio||''}</textarea>
+        </div>
+        <button class="btn btn-primary" type="submit">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Change Password -->
+    <div class="pf-section">
+      <h3>Change Password</h3>
+      ${user.password_hash ? `
+      <form action="/profile/password" method="POST">
+        <div class="field-group">
+          <label>Current Password</label>
+          <input type="password" name="current_password" required/>
+        </div>
+        <div class="field-group">
+          <label>New Password</label>
+          <input type="password" name="new_password" required minlength="6"/>
+        </div>
+        <div class="field-group">
+          <label>Confirm New Password</label>
+          <input type="password" name="confirm_password" required minlength="6"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Change Password</button>
+      </form>` : '<p class="text-muted">Your account uses social login — password change is not available.</p>'}
+    </div>
+
+    <!-- Recent Threads -->
+    <div class="pf-section">
+      <h3>My Recent Threads</h3>
+      ${userThreads.length ? userThreads.map(t => `
+      <a href="/forum/thread/${t.id}" class="thread-preview-card">
+        <div class="tp-info">
+          <span class="tp-title">${t.title}</span>
+          <span class="tp-meta">${t.cat_name} · ${new Date(t.created_at).toLocaleDateString()}</span>
+        </div>
+      </a>`).join('') : '<p class="text-muted">No threads yet. <a href="/forum/thread/new">Create one!</a></p>'}
+    </div>
+  </div>
+</div>
+
+<script>
+function previewAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => document.getElementById('avatarPreview').src = e.target.result;
+    reader.readAsDataURL(input.files[0]);
+    input.form.submit();
+  }
+}
+</script>
+` }) %>

@@ -1,0 +1,23 @@
+<%- include('layout', { body: `
+<div class="page-header"><div class="container"><h1>📢 Broadcast Message</h1><p>Send to all users or a specific user</p></div></div>
+<div class="container narrow mt-3">
+  <form action="/messages/broadcast" method="POST">
+    <div class="field-group">
+      <label>Target</label>
+      <select name="target">
+        <option value="all">📢 All Users</option>
+        ${users.map(u => `<option value="${u.id}">${u.username}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Subject</label>
+      <input type="text" name="subject" placeholder="Broadcast subject..."/>
+    </div>
+    <div class="field-group">
+      <label>Message</label>
+      <textarea name="content" rows="8" placeholder="Write your broadcast message..." required></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Send Broadcast</button>
+  </form>
+</div>
+` }) %>

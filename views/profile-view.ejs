@@ -1,0 +1,31 @@
+<%- include('layout', { body: `
+<div class="container profile-layout mt-3">
+  <div class="profile-sidebar">
+    <div class="profile-avatar-wrap">
+      <img src="${profile.avatar}" class="profile-avatar-big" onerror="this.src='/img/default-avatar.png'"/>
+    </div>
+    <div class="profile-info-block">
+      <h2>${profile.username}</h2>
+      <span class="rank-tag ${profile.role} lg">${profile.site_rank||profile.role}</span>
+      <p class="profile-bio">${profile.bio||'This user has no bio.'}</p>
+      <div class="profile-meta">
+        <span>🗓 Joined ${new Date(profile.created_at).toLocaleDateString()}</span>
+        <span>💎 ${profile.subscription||'Free'} Plan</span>
+      </div>
+    </div>
+    ${user && user.id !== profile.id ? `<a href="/messages/compose?to=${profile.id}" class="btn btn-primary full-width mt-2">✉ Send Message</a>` : ''}
+  </div>
+  <div class="profile-forms">
+    <div class="pf-section">
+      <h3>Recent Threads by ${profile.username}</h3>
+      ${userThreads.length ? userThreads.map(t => `
+      <a href="/forum/thread/${t.id}" class="thread-preview-card">
+        <div class="tp-info">
+          <span class="tp-title">${t.title}</span>
+          <span class="tp-meta">${t.cat_name} · ${new Date(t.created_at).toLocaleDateString()}</span>
+        </div>
+      </a>`).join('') : '<p class="text-muted">No threads yet.</p>'}
+    </div>
+  </div>
+</div>
+` }) %>

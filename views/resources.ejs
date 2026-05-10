@@ -1,0 +1,55 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container">
+    <h1>Resources</h1>
+    <p>Download setups, plugins, maps, mods and more for your server.</p>
+  </div>
+</div>
+
+<div class="container resources-layout">
+  <!-- Sidebar -->
+  <aside class="resources-sidebar">
+    <h3>Categories</h3>
+    <ul>
+      ${categories.map(cat => `
+      <li>
+        <a href="/resources?cat=${encodeURIComponent(cat)}" class="${activeCat===cat?'active':''}">
+          ${{Setups:'⚙️',Plugins:'🔌',Configs:'📄',Scripts:'📜',Maps:'🗺️','Resource Packs':'🎨',Mods:'🧩',Other:'📦'}[cat]||'📂'}
+          ${cat}
+        </a>
+      </li>`).join('')}
+    </ul>
+    ${user ? `<a href="/resources/upload" class="btn btn-primary mt-2 full-width">+ Upload Resource</a>` : `<p class="sidebar-login-note"><a href="#" onclick="openAuth('login')">Log in</a> to upload resources.</p>`}
+  </aside>
+
+  <!-- Content -->
+  <div class="resources-content">
+    <div class="resources-header">
+      <h2>${activeCat}</h2>
+      <span>${resources.length} resource${resources.length!==1?'s':''}</span>
+    </div>
+    ${resources.length ? `
+    <div class="resources-grid">
+      ${resources.map(r => `
+      <a href="/resources/${r.id}" class="resource-card">
+        <div class="rc-image" style="${r.image_url?'background-image:url('+r.image_url+')':''}">${!r.image_url?'📦':''}</div>
+        <div class="rc-body">
+          <h3>${r.title}</h3>
+          <p>${r.description||'No description provided.'}</p>
+          <div class="rc-meta">
+            <span>by ${r.username}</span>
+            <span>↓ ${r.downloads}</span>
+          </div>
+        </div>
+      </a>`).join('')}
+    </div>
+    ${totalPages > 1 ? `
+    <div class="pagination">
+      ${page > 1 ? `<a href="/resources?cat=${activeCat}&page=${page-1}" class="btn btn-outline">← Prev</a>` : ''}
+      <span>Page ${page} of ${totalPages}</span>
+      ${page < totalPages ? `<a href="/resources?cat=${activeCat}&page=${page+1}" class="btn btn-outline">Next →</a>` : ''}
+    </div>` : ''}
+    ` : `<div class="empty-state-box"><p>No ${activeCat} uploaded yet.</p>${user?`<a href="/resources/upload" class="btn btn-primary">Be the first!</a>`:''}</div>`}
+  </div>
+</div>
+` }) %>

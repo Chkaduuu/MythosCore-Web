@@ -1,0 +1,127 @@
+<%- include('layout', { body: `
+
+<!-- Hero Banner Carousel -->
+<section class="hero-section">
+  <div class="banner-carousel" id="carousel">
+    ${banners.map((b, i) => `
+    <div class="banner-slide ${i===0?'active':''}" style="${b.image_url?'background-image:url('+b.image_url+')':''}" data-index="${i}">
+      <div class="banner-overlay"></div>
+      <div class="banner-content">
+        <h1>${b.title || ''}</h1>
+        <p>${b.content || ''}</p>
+        ${b.link_url ? `<a href="${b.link_url}" class="btn btn-primary">Learn More</a>` : ''}
+      </div>
+    </div>`).join('')}
+    ${banners.length > 1 ? `
+    <button class="carousel-prev" onclick="carouselPrev()">‹</button>
+    <button class="carousel-next" onclick="carouselNext()">›</button>
+    <div class="carousel-dots">
+      ${banners.map((_,i) => `<span class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></span>`).join('')}
+    </div>` : ''}
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num">${stats.users.toLocaleString()}</span>
+      <span class="stat-label">Members</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">${stats.threads.toLocaleString()}</span>
+      <span class="stat-label">Forum Threads</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">${stats.resources.toLocaleString()}</span>
+      <span class="stat-label">Resources</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">Uptime</span>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features-section">
+  <div class="container">
+    <h2 class="section-title">Why MythosCore?</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚔️</div>
+        <h3>Epic Gameplay</h3>
+        <p>Custom plugins, unique mechanics, and events that keep the adventure fresh every week.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Massive World</h3>
+        <p>Explore handcrafted landscapes, dungeons, and biomes built by our dedicated team.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Active Community</h3>
+        <p>Thousands of players, active Discord, forum and regular events. Never play alone.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Anti-Cheat</h3>
+        <p>State-of-the-art anti-cheat and dedicated moderation team keeping the game fair.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Forum Posts -->
+<section class="recent-section">
+  <div class="container two-col">
+    <div class="col-main">
+      <h2 class="section-title">Recent Discussions</h2>
+      ${recentThreads.length ? recentThreads.map(t => `
+      <a href="/forum/thread/${t.id}" class="thread-preview-card">
+        <img src="${t.avatar}" onerror="this.src='/img/default-avatar.png'" class="tp-avatar"/>
+        <div class="tp-info">
+          <span class="tp-title">${t.title}</span>
+          <span class="tp-meta">by ${t.username} · ${t.cat_name}</span>
+        </div>
+      </a>`).join('') : '<p class="empty-state">No discussions yet. <a href="/forum">Start one!</a></p>'}
+      <a href="/forum" class="btn btn-outline mt-2">View All Threads →</a>
+    </div>
+    <div class="col-side">
+      <h2 class="section-title">Quick Links</h2>
+      <div class="quick-links">
+        <a href="/subscribe" class="ql-card gold"><span>⭐</span>Subscribe</a>
+        <a href="/resources" class="ql-card"><span>📦</span>Resources</a>
+        <a href="/discord" class="ql-card discord"><span>💬</span>Discord</a>
+        <a href="/forum/thread/new" class="ql-card"><span>✏️</span>New Thread</a>
+      </div>
+      <div class="server-info-card">
+        <h4>Server Info</h4>
+        <div class="si-row"><span>IP</span><code>play.mythoscore.net</code></div>
+        <div class="si-row"><span>Version</span><code>1.21+</code></div>
+        <div class="si-row"><span>Mode</span><code>Survival / Creative</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.banner-slide');
+const dots = document.querySelectorAll('.dot');
+let autoplay = setInterval(carouselNext, 5000);
+
+function goToSlide(n) {
+  slides[currentSlide]?.classList.remove('active');
+  dots[currentSlide]?.classList.remove('active');
+  currentSlide = (n + slides.length) % slides.length;
+  slides[currentSlide]?.classList.add('active');
+  dots[currentSlide]?.classList.add('active');
+}
+function carouselNext() { goToSlide(currentSlide + 1); }
+function carouselPrev() { goToSlide(currentSlide - 1); }
+</script>
+` }) %>

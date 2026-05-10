@@ -1,0 +1,28 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <h1>Forum</h1>
+      <p>${totalPosts.toLocaleString()} posts · ${totalMembers.toLocaleString()} members</p>
+    </div>
+    ${user ? `<a href="/forum/thread/new" class="btn btn-primary">+ New Thread</a>` : `<button class="btn btn-primary" onclick="openAuth('register')">Join to Post</button>`}
+  </div>
+</div>
+
+<div class="container">
+  ${categories.map(cat => `
+  <div class="forum-category-block">
+    <a href="/forum/category/${cat.id}" class="forum-cat-header">
+      <span class="cat-icon">${cat.icon}</span>
+      <div class="cat-info">
+        <h3>${cat.name}</h3>
+        <p>${cat.description||''}</p>
+      </div>
+      <div class="cat-stats">
+        <span>${cat.threadCount} threads</span>
+        ${cat.latestThread ? `<span class="cat-latest">Latest: <a href="/forum/thread/${cat.latestThread.id}" onclick="event.stopPropagation()">${cat.latestThread.title.substring(0,30)}…</a> by ${cat.latestThread.username}</span>` : ''}
+      </div>
+    </a>
+  </div>`).join('')}
+</div>
+` }) %>

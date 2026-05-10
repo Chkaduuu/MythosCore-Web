@@ -1,0 +1,40 @@
+<%- include('layout', { body: `
+<div class="page-header">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <h1>${cat.icon} ${cat.name}</h1>
+      <p>${cat.description||''} · <a href="/forum">← Back to Forum</a></p>
+    </div>
+    ${user ? `<a href="/forum/thread/new?cat=${cat.id}" class="btn btn-primary">+ New Thread</a>` : ''}
+  </div>
+</div>
+
+<div class="container">
+  ${threads.length ? `
+  <div class="thread-list">
+    ${threads.map(t => `
+    <a href="/forum/thread/${t.id}" class="thread-row ${t.pinned?'pinned':''}">
+      <div class="tr-status">
+        ${t.pinned ? '<span title="Pinned">📌</span>' : ''}
+        ${t.locked ? '<span title="Locked">🔒</span>' : ''}
+        ${!t.pinned && !t.locked ? '💬' : ''}
+      </div>
+      <div class="tr-info">
+        <span class="tr-title">${t.title}</span>
+        <span class="tr-meta">by <strong>${t.username}</strong> · ${new Date(t.created_at).toLocaleDateString()}</span>
+      </div>
+      <div class="tr-stats">
+        <span>👁 ${t.views}</span>
+        <span>💬 ${t.reply_count}</span>
+      </div>
+    </a>`).join('')}
+  </div>
+  ${totalPages > 1 ? `
+  <div class="pagination">
+    ${page > 1 ? `<a href="/forum/category/${cat.id}?page=${page-1}" class="btn btn-outline">← Prev</a>` : ''}
+    <span>Page ${page} of ${totalPages}</span>
+    ${page < totalPages ? `<a href="/forum/category/${cat.id}?page=${page+1}" class="btn btn-outline">Next →</a>` : ''}
+  </div>` : ''}
+  ` : `<div class="empty-state-box"><p>No threads yet in this category.</p>${user?`<a href="/forum/thread/new?cat=${cat.id}" class="btn btn-primary">Create the first thread</a>`:''}</div>`}
+</div>
+` }) %>

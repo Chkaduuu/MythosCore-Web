@@ -1,0 +1,22 @@
+<%- include('layout', { body: `
+<div class="container mt-3">
+  <div class="breadcrumb"><a href="/resources">Resources</a> › <a href="/resources?cat=${resource.category}">${resource.category}</a> › ${resource.title}</div>
+  <div class="resource-detail-card">
+    ${resource.image_url ? `<div class="rd-image" style="background-image:url(${resource.image_url})"></div>` : ''}
+    <div class="rd-body">
+      <div class="rd-header">
+        <h1>${resource.title}</h1>
+        <span class="resource-cat-badge">${resource.category}</span>
+      </div>
+      <p class="rd-desc">${resource.description||'No description.'}</p>
+      <div class="rd-meta">
+        <img src="${resource.avatar}" class="msg-avatar" onerror="this.src='/img/default-avatar.png'"/>
+        <span>by <a href="/profile/${resource.user_id}">${resource.username}</a></span>
+        <span>📅 ${new Date(resource.created_at).toLocaleDateString()}</span>
+        <span>↓ ${resource.downloads} downloads</span>
+      </div>
+      ${resource.download_url ? `<a href="${resource.download_url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-large mt-2">↓ Download</a>` : '<p class="text-muted">No download link provided.</p>'}
+    </div>
+  </div>
+</div>
+` }) %>
